@@ -108,10 +108,11 @@ class EmailProcessor
         topic.team_list.add(token)
         topic.save
       end
-      if email.headers.has_key?("X-Helpy-Support-Group")
-        pp email.headers["X-Helpy-Support-Group"]
-        topic.team_list.add(email.headers["X-Helpy-Support-Group"])
-        topic.save
+      unless email.headers.nil?
+        if email.headers.include?("X-Helpy-Support-Group")
+          topic.team_list.add(email.headers["X-Helpy-Support-Group"])
+          topic.save
+        end
       end
       #insert post to new topic
       message = "-" if message.blank? && number_of_attachments > 0
