@@ -31,6 +31,19 @@ class EmailProcessorTest < ActiveSupport::TestCase
     assert_equal "to_user@email.com", Post.last.email_to_address
   end
 
+  test 'an email to the support address with a group tag should assign the topic to the group' do
+    assert_difference('Topic.where(current_status: "new").count', 1) do
+      assert_difference('Post.count', 1) do
+        assert_difference('User.count', 1) do
+          assert_difference('ActionMailer::Base.deliveries.size', 2) do
+            EmailProcessor.new(build(:email_with_group_header)).process
+          end
+        end
+      end
+    end
+    assert Topic.last.team_list.include?('group')
+  end
+
   test 'a spam email should be rejected and not create ticket, user, and should not send emails' do
     assert_difference('Topic.where(current_status: "new").count', 0) do
       assert_difference('Post.count', 0) do

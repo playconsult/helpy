@@ -4,7 +4,17 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
+    body { 'Hello!' }
+    spam_score { '0.11' }
+    spam_report { '' }
+  end
+
+  factory :email_with_group_header, class: OpenStruct do
+    to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
+    from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }) }
+    subject { 'email subject' }
+    headers { { 'X-Helpy-Support-Group' => 'group' } }
     body { 'Hello!' }
     spam_score { '0.11' }
     spam_report { '' }
@@ -14,7 +24,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'blacklist', host: 'email.com', email: 'blacklist@email.com', full: 'blacklist <blacklist@email.com>', name: 'blacklist User' }) }
     subject { 'spam email subject' }
-    header {}
+    headers {}
     body { 'Spam' }
   end
 
@@ -22,7 +32,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'spam_user', host: 'email.com', email: 'spammer_email@email.com', full: 'spammer <spam_user@email.com>', name: 'Spam User' }) }
     subject { 'spam email subject' }
-    header {}
+    headers {}
     body { 'Spam' }
     spam_score { '6.0' }
     spam_report { 'spam report' }
@@ -32,17 +42,17 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'spam_user', host: 'email.com', email: 'spammer_email@email.com', full: 'spammer <spam_user@email.com>', name: 'Spam User' }) }
     subject { 'spam email subject' }
-    header {}
+    headers {}
     body { 'Spam' }
     spam_score { '3.0' }
     spam_report { 'spam report' }
-  end  
+  end
 
   factory :email_from_includes_numbers, class: OpenStruct do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user1990', host: 'email.com', email: 'from_email1990@email.com', full: 'From1990 <from_user1990@email.com>', name: '' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -50,7 +60,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: '' }) }
     subject { 'Fwd: email subject' }
-    header {}
+    headers {}
     raw_body { '---------- Forwarded message ---------\nFrom: Happy Forwarder <happyfwd@test.com> \nDate: Wed, Nov 7, 2018 at 5:05 AM\nSubject: Re: Test forward\nTo: to_user\n\nThis is the body here!' }
     body { '---------- Forwarded message ---------\nFrom: Happy Forwarder <happyfwd@test.com> \nDate: Wed, Nov 7, 2018 at 5:05 AM\nSubject: Re: Test forward\nTo: to_user\n\nThis is the body here!' }
   end
@@ -59,7 +69,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { "hi \xAD" }
   end
 
@@ -67,7 +77,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'from_user@email.com', name: '' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -75,7 +85,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user.me7731', host: 'email.com', email: 'from_user.me7731@email.com', full: 'from_user.me7731@email.com', name: '' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -83,7 +93,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com <to_user@email.com>, second_user <second_user@email.com>', email: 'to_user@email.com, second_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -91,7 +101,7 @@ FactoryBot.define do
     to { [{ full: '"to_user@email.com" <to_user@email.com>', email: '"to_user@email.com"', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: '"From User" <from_user@email.com>', name: 'From User' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -141,7 +151,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'scott.miller', host: 'test.com', email: 'scott.miller@test.com', full: 'Scott Miller <scott.miller@test.com>', name: 'Scott Miller' }) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -149,7 +159,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from { ({ token: 'scott.miller', host: 'test.com', email: 'scott.miller@test.com', full: 'Scott Miller <scott.miller@test.com>', name: 'Scott Miller' }) }
     subject { "Re: [Helpy Support] #1-Pending private topic" }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -158,7 +168,7 @@ FactoryBot.define do
     from { ({ token: 'scott.miller', host: 'test.com', email: 'scott.miller@test.com', full: 'Scott Miller <scott.miller@test.com>', name: 'Scott Miller' }) }
     cc { ([{ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }]) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -170,7 +180,7 @@ FactoryBot.define do
       { token: 'support', host: 'email.com', email: 'support@mysite.com', full: 'Mysite Support <support@mysite.com>', name: 'Mysite Support' }
       ]) }
     subject { 'email subject' }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -179,7 +189,7 @@ FactoryBot.define do
     from { ({ token: 'scott.miller', host: 'test.com', email: 'scott.miller@test.com', full: 'Scott Miller <scott.miller@test.com>', name: 'Scott Miller' }) }
     cc { ([{ token: 'from_user', host: 'email.com', email: 'from_email@email.com', full: 'From User <from_user@email.com>', name: 'From User' }]) }
     subject {''}
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -187,7 +197,7 @@ FactoryBot.define do
     to { [{ full: 'to_user@email.com', email: 'to_user@email.com', token: 'to_user', host: 'email.com', name: nil }] }
     from{ ({ token: 'scott.miller', host: 'test.com', email: 'scott.miller@test.com', full: 'Scott Miller <scott.miller@test.com>', name: 'Scott Miller' }) }
     subject { "Re: [Helpy Support] #3-Closed private topic" }
-    header {}
+    headers {}
     body { 'Hello!' }
   end
 
@@ -206,5 +216,5 @@ FactoryBot.define do
     password { 'password' }
     account_number { '123456' }
   end
-  
+
 end
