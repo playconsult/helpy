@@ -8,9 +8,6 @@ class EmailProcessor
 
   def process
 
-
-
-
     # Guard clause to prevent ESPs like Sendgrid from posting over and over again
     # if the email presented is invalid and generates a 500.  Returns a 200
     # error as discussed on https://sendgrid.com/docs/API_Reference/Webhooks/parse.html
@@ -96,7 +93,7 @@ class EmailProcessor
     end
 
     topic = Forum.first.topics.new(
-      name: subject, 
+      name: subject,
       user_id: @user.id,
       private: true,
       current_status: ticket_status,
@@ -109,6 +106,11 @@ class EmailProcessor
         topic.team_list.add(token.split('+')[1])
         topic.save
         topic.team_list.add(token)
+        topic.save
+      end
+      if email.headers.has_key?("X-Helpy-Support-Group")
+        pp email.headers["X-Helpy-Support-Group"]
+        topic.team_list.add(email.headers["X-Helpy-Support-Group"])
         topic.save
       end
       #insert post to new topic
@@ -184,11 +186,11 @@ class EmailProcessor
   end
 
   # Adds a reply to an existing ticket thread from an email response.
-  def self.create_reply_from_email(email, email_address, email_name, subject, raw, message, token, to, sitename, cc, number_of_attachments, spam_score, spam_report)      
-    
+  def self.create_reply_from_email(email, email_address, email_name, subject, raw, message, token, to, sitename, cc, number_of_attachments, spam_score, spam_report)
+
     # flag as spam if below spam score threshold
     ticket_status = (spam_score > AppSettings["email.spam_assassin_filter"].to_f) ? "spam" : "new"
-        
+
     @user = User.where("lower(email) = ?", email_address).first
     if @user.nil?
       @user = EmailProcessor.create_user_for_email(email_address, token, email_name, ticket_status)
@@ -235,7 +237,7 @@ class EmailProcessor
     if @user.save
       UserMailer.new_user(@user.id, @token).deliver_later if @user.save && ticket_status != "spam"
     else
-      @user = User.find(2) # just in case new user not saved, default to system user  
+      @user = User.find(2) # just in case new user not saved, default to system user
     end
     return @user
   end
