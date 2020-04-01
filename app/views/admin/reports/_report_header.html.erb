@@ -2,7 +2,7 @@
   <div class="col-md-12 clearfix">
     <h3>
       <%= show_responsive_nav %>
-      <%= report_name %>:
+      <%= report_name + (if @group.nil? then "" else " (#{@group})" end) %>:
       <%= content_tag :span, class: "dropdown pull-right" do %>
         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
           <%= @interval.sentence_case %>

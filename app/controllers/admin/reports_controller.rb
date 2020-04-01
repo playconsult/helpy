@@ -5,6 +5,7 @@ class Admin::ReportsController < Admin::BaseController
   before_action :get_all_teams
 
   before_action :date_from_params
+  before_action :group_from_params
   before_action :scope_data
   before_action :set_interval
   before_action :set_timezone
@@ -58,10 +59,12 @@ class Admin::ReportsController < Admin::BaseController
                     t('this_month')
                   when 'last_month'
                     t('last_month')
+                  when '30_days'
+                    t('last_30_days')
                   when 'interval'
                     "Between #{@start_date.to_date} and #{@end_date.to_date}"
                   else
-                    t('this_week')
+                    t('filter')
                 end
 
   end
@@ -69,13 +72,22 @@ class Admin::ReportsController < Admin::BaseController
   def scope_data
     @scoped_stats = Topic.where('topics.created_at >= ? AND topics.created_at <= ?', @start_date, @end_date)
     @scoped_posts = Post.where('created_at >= ? AND created_at <= ?', @start_date, @end_date)
+    unless @group.nil?
+      @scoped_stats = @scoped_stats.tagged_with(@group)
+    end
   end
 
   def get_daily_stats
-    @tickets = Topic.group_by_day(:created_at, range: @start_date..@end_date).count
-    @closed = Topic.where(current_status: 'closed').group_by_day(:created_at, range: @start_date..@end_date).count
-    @actions = Post.group_by_day(:created_at, range: @start_date..@end_date).count
-    get_total_stats
+    if @group.nil?
+      @tickets = Topic.group_by_day(:created_at, range: @start_date..@end_date).count
+      @closed = Topic.where(current_status: 'closed').group_by_day(:created_at, range: @start_date..@end_date).count
+      @actions = Post.group_by_day(:created_at, range: @start_date..@end_date).count
+    else
+      @tickets = Topic.tagged_with(@group).group_by_day(:created_at, range: @start_date..@end_date).count
+      @closed = Topic.tagged_with(@group).where(current_status: 'closed').group_by_day(:created_at, range: @start_date..@end_date).count
+      @actions = Post.joins(:topic => :taggings).joins("LEFT OUTER JOIN tags on tags.id = taggings.tag_id").where('tags.name': @group).group_by_day('posts.created_at', range: @start_date..@end_date).count
+    end
+      get_total_stats
   end
 
   def get_hourly_stats
@@ -94,7 +106,9 @@ class Admin::ReportsController < Admin::BaseController
     @total_activities = @scoped_posts.count
     filtered_stats = @scoped_stats.where("current_status = ? AND closed_date IS NOT NULL", 'closed')
     arr_time_differences = filtered_stats.map {|t| t.closed_date - t.created_at} unless filtered_stats.nil?
+    arr_post_differences = filtered_stats.select { |t| not t.posts.second.nil? }.map {|t| t.posts.second.created_at - t.created_at} unless filtered_stats.nil?
     @median_close_time = median(arr_time_differences).round unless arr_time_differences.size == 0
+    @median_response_time = median(arr_post_differences).round unless arr_post_differences.size == 0
   end
 
   def set_timezone
