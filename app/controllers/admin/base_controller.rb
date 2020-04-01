@@ -76,6 +76,14 @@ class Admin::BaseController < ApplicationController
     end
   end
 
+  def group_from_params
+    if params[:group].present?
+      @group = params[:group]
+    else
+      @group = nil
+    end
+  end
+
   # Get a list of topics for a passed in status
   # Used by topics#index and #show and called from other methods that need to
   # refresh the UI
@@ -86,7 +94,7 @@ class Admin::BaseController < ApplicationController
     else
       topics_raw = params[:team].present? ? Topic.all.tagged_with(params[:team], any: true) : Topic
     end
-    
+
     # Only include cloudinary files if enabled
     topics_raw = cloudinary_enabled? ? topics_raw.includes(user: :avatar_files).chronologic : topics_raw.includes(:user).chronologic
 

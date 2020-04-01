@@ -454,7 +454,7 @@ en:
   mail_smtp: SMTP Server
   mail_port: SMTP Port
   mail_domain: SMTP Domain
-  spam_assassin_reject: SpamAssassin Threshold for rejecting incoming email tickets 
+  spam_assassin_reject: SpamAssassin Threshold for rejecting incoming email tickets
   spam_assassin_filter: SpamAssassin Threshold for marking incoming tickets spam
   email_blacklist: Automatically mark tickets from these addresses as spam (separate multiple with commas)
 
@@ -472,13 +472,17 @@ en:
   activity_report: "Activity Report"
   team_insights: "Team Insights"
   filter_by_date: "Filter by date"
+  filter: "Filter"
   today: "Today"
   yesterday: "Yesterday"
   this_week: "This week"
+  last_30_days: "Last 30 days"
   last_week: "Last week"
   this_month: "This month"
   last_month: "Last month"
   date_range: "Date Range"
+  insight_group_filter: "Group: "
+  insight_all_groups: "All groups"
   insight_start_range: "Start date:"
   insight_end_range: "End date:"
   insight_filter: "Filter"
