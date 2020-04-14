@@ -101,6 +101,7 @@ class Admin::SettingsController < Admin::BaseController
     update_params = params.keys.select { |key| key.to_s.match('settings.') }
     update_params += params.keys.select { |key| key.to_s.match('cloudinary.') }
     update_params += params.keys.select { |key| key.to_s.match('webhook.') }
+    update_params += params.keys.select { |key| key.to_s.match('slack.') }
     settings_update(update_params)
 
     flash[:success] = t(:settings_changes_saved,

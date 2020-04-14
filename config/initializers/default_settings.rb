@@ -90,6 +90,10 @@ AppSettings.defaults["email.spam_assassin_reject"]= 4
 AppSettings.defaults["email.spam_assassin_filter"]= 2
 AppSettings.defaults["email.email_blacklist"] = ""
 
+# Slack specific:
+
+AppSettings.defaults["slack.notify_webhook"] = Settings.slack_webhook
+
 # notifications
 
 AppSettings.defaults["notify.on_private"] = "1"

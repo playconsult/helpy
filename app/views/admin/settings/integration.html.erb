@@ -58,6 +58,17 @@
           <%= f.password_field 'cloudinary.api_secret', value: AppSettings['cloudinary.api_secret'], label: "Cloudinary API Secret" %>
         </div>
       </div>
+      <div class="row integration-item vcenter">
+        <div class="col-md-6">
+          <span class="more-important">Slack</span>
+          <p class="less-important">
+            Slack enables teams to connect
+          </p>
+        </div>
+        <div class="col-md-6">
+          <%= f.text_field 'slack.notify_webhook', value: AppSettings['slack.notify_webhook'], label: "Slack webhook" %>
+        </div>
+      </div>
 
     </div>
     <div class="submit-section">

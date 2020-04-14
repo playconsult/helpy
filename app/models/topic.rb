@@ -31,7 +31,7 @@ class Topic < ActiveRecord::Base
 
   include SentenceCase
   include Hashid::Rails
-  
+
   belongs_to :forum, counter_cache: true, touch: true
   belongs_to :user, counter_cache: true, touch: true
   belongs_to :doc, counter_cache: true, touch: true
@@ -272,6 +272,18 @@ class Topic < ActiveRecord::Base
     end
   end
 
+  def slack_webhook
+    system_webhook = AppSettings['slack.notify_webhook']
+    return system_webhook if self.team_list.blank?
+
+    team = ActsAsTaggableOn::Tag.where('lower(name) = ?', self.team_list.first.downcase).first
+    if team.email_address.present? and team.email_address.include? "http"
+      team.email_address
+    else
+      system_webhook
+    end
+  end
+
   def posts_in_last_minute
     self.posts.where(created_at: Time.now-1.minutes..Time.now, kind: 'reply').count
   end
@@ -283,7 +295,7 @@ class Topic < ActiveRecord::Base
     if AppSettings['email.email_blacklist'].split(",").any? { |s| self.user.email.downcase.include?(s.downcase) }
        self.current_status = "spam"
     end
-  end  
+  end
 
   def cache_user_name
     return if self.user.nil?
