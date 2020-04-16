@@ -1,19 +1,16 @@
 require 'net/http'
-require 'pp'
 class SlackNotifier
 
-  def initialize()
-    self.default_webhook = AppSettings["slack.notify_webhook"]
+  def self.notify_topic(topic_id)
+    @topic = Topic.find(topic_id)
+    body = build_notification(@topic, @topic.posts.first, "created")
+    send_notification(@topic.slack_webhook, body)
   end
 
-  def self.notify_topic(topic)
-    body = build_notification(topic, topic.posts.first, "created")
-    send_notification(topic.slack_webhook, body)
-  end
-
-  def self.notify_reply(post)
-    body = build_notification(post.topic, post, "updated")
-    send_notification(topic.slack_webhook, body)
+  def self.notify_reply(post_id)
+    @post = Post.find(post_id)
+    body = build_notification(@post.topic, @post, "updated")
+    send_notification(@post.topic.slack_webhook, body)
   end
 
 
@@ -22,21 +19,34 @@ class SlackNotifier
   def self.build_notification(topic, post, action)
     return {
       "username": AppSettings["settings.site_name"],
-      "attachments":[
-          {
-             "fallback":"Ticket has been #{action}: (#{topic.id}) #{topic.name}",
-             "pretext":"Ticket has been #{action}",
-             "color":"#{AppSettings["css.main_color"]}",
-             "fields":[
-                {
-                   "title":"\##{topic.id}: #{topic.name}",
-                   "title_link": "#{AppSettings["settings.site_url"]}/admin/topics/#{topic.id}",
-                   "value": "#{if post.nil? then topic.user_name else post.body end}",
-                   "short": false
-                }
-             ]
-          }
-       ]
+      "text": "#{AppSettings["settings.site_name"]}: Ticket #{action}",
+      "blocks": [
+      		{
+      			"type": "section",
+      			"text": {
+      				"type": "mrkdwn",
+      				"text": "Ticket has been #{action}:"
+      			}
+      		},
+      		{
+      			"type": "section",
+      			"block_id": "section567",
+      			"text": {
+      				"type": "mrkdwn",
+      				"text": "<#{AppSettings['settings.site_url']}/admin/topics/#{topic.id}|\##{topic.id}: #{topic.name}>"
+      			}
+      		},
+      		{
+      			"type": "section",
+      			"block_id": "section789",
+      			"fields": [
+      				{
+      					"type": "mrkdwn",
+      					"text": "#{if post.nil? then topic.user_name else "#{post.user.name}: #{post.body}" end}"
+      				}
+      			]
+      		}
+      	]
     }
   end
 

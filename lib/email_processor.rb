@@ -1,6 +1,3 @@
-require 'slack_notifier'
-require 'pp'
-
 class EmailProcessor
 
   def initialize(email)
@@ -43,13 +40,6 @@ class EmailProcessor
       topic = EmailProcessor.create_forwarded_message_from_email(@email, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
     else # this is a new direct message
       topic = EmailProcessor.create_new_ticket_from_email(@email, email_address, email_name, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
-    end
-
-    if topic
-      SlackNotifier.notify_topic(topic)
-    end
-    if post
-      SlackNotifier.notify_reply(post)
     end
 
   # rescue

@@ -277,7 +277,7 @@ class Topic < ActiveRecord::Base
     return system_webhook if self.team_list.blank?
 
     team = ActsAsTaggableOn::Tag.where('lower(name) = ?', self.team_list.first.downcase).first
-    if team.email_address.present? and team.email_address.include? "http"
+    if team.email_address.present? and team.email_address.downcase.include? "http"
       team.email_address
     else
       system_webhook
