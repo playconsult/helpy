@@ -35,11 +35,11 @@ class EmailProcessor
     spam_report = @email.spam_report
 
     if subject.include?("[#{sitename}]") # this is a reply to an existing topic
-      EmailProcessor.create_reply_from_email(@email, email_address, email_name, subject, raw, message, token, to, sitename, cc, number_of_attachments, @spam_score, spam_report)
+      post = EmailProcessor.create_reply_from_email(@email, email_address, email_name, subject, raw, message, token, to, sitename, cc, number_of_attachments, @spam_score, spam_report)
     elsif subject.include?("Fwd: ") # this is a forwarded message TODO: Expand this to handle foreign email formatting
-      EmailProcessor.create_forwarded_message_from_email(@email, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
+      topic = EmailProcessor.create_forwarded_message_from_email(@email, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
     else # this is a new direct message
-      EmailProcessor.create_new_ticket_from_email(@email, email_address, email_name, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
+      topic = EmailProcessor.create_new_ticket_from_email(@email, email_address, email_name, subject, raw, message, token, to, cc, number_of_attachments, @spam_score, spam_report)
     end
 
   # rescue
@@ -132,6 +132,8 @@ class EmailProcessor
         @tracker.event(category: "Email", action: "Inbound", label: "New Topic", non_interactive: true)
         @tracker.event(category: "Agent: Unassigned", action: "New", label: topic.to_param)
       end
+
+      return topic
     end
   end
 
@@ -183,6 +185,8 @@ class EmailProcessor
         @tracker.event(category: "Email", action: "Inbound", label: "Forwarded New Topic", non_interactive: true)
         @tracker.event(category: "Agent: Unassigned", action: "Forwarded New", label: topic.to_param)
       end
+
+      return topic
     end
   end
 
@@ -220,6 +224,8 @@ class EmailProcessor
         @tracker.event(category: "Email", action: "Inbound", label: "Reply", non_interactive: true)
         @tracker.event(category: "Agent: #{topic.assigned_user.name}", action: "User Replied by Email", label: topic.to_param) unless topic.assigned_user.nil?
       end
+
+      return post
     end
   end
 

@@ -1,3 +1,4 @@
+require 'slack_notifier'
 # == Schema Information
 #
 # Table name: posts
@@ -117,6 +118,9 @@ class Post < ActiveRecord::Base
     # Handle new private ticket notification:
     if self.kind == "first" && self.topic.private?
       NotificationMailer.new_private(self.topic_id).deliver_later
+      if self.topic.slack_webhook.present?
+        SlackNotifier.notify_topic(self.topic_id)
+      end
     # Handles new public ticket notification:
     elsif self.kind == "first" && self.topic.public?
       NotificationMailer.new_public(self.topic_id).deliver_later
@@ -124,6 +128,9 @@ class Post < ActiveRecord::Base
     # Handles customer reply notification:
     elsif self.kind == "reply" && self.user_id == self.topic.user_id && self.topic.private?
       NotificationMailer.new_reply(self.topic_id).deliver_later
+      if self.topic.slack_webhook.present?
+        SlackNotifier.notify_reply(id)
+      end
 
     # Reply from user back to the system
     elsif self.kind == "reply" && self.user_id != self.topic.user_id && self.topic.private?
